@@ -23,6 +23,7 @@ namespace Grafy_4
         public MainWindow()
         {
             InitializeComponent();
+            //aaa
         }
     }
 }
