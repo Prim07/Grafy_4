@@ -5,8 +5,41 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Grafy_4"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
-    </Grid>
+        Title="MainWindow" Height="700" Width="1004">
+    <Canvas>
+        <Canvas Name="MyCanvas" Background="LightCyan" Height="425" Width="700" Canvas.Left="3" Canvas.Top="10">
+
+        </Canvas>
+        <StackPanel Name="MyStackPanel" HorizontalAlignment="Right" Canvas.Left="708" Canvas.Top="10" Width="279" Height="656" Background="AliceBlue">
+            <Button Content="Losuj Diraf G(n, p)" HorizontalAlignment="Center" VerticalAlignment="Top" Width="279" Height="40" Margin="0,0,-0.333,0" Click="Button_Click" />
+            <StackPanel Orientation="Horizontal" Margin="18,10,9.667,0">
+                <TextBlock Text="Z prawdopodobieństwem&#xA;wystąpienia krawędzi (0 - 100%):" Width="184"/>
+                <TextBox x:Name="Probability_Of_Edge_Occurence" Width="66" Height="20" PreviewTextInput="NumbersOnly_PreviewTextInput" Text="60"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="18,0,9.667,20" Height="25">
+                <TextBlock Text="Ilość wierzchołków:" Width="184" VerticalAlignment="Center"/>
+                <TextBox x:Name="Number_Of_Vertex" Width="66" Height="20" Text="4"/>
+            </StackPanel>
+
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="700" Height="226" Canvas.Top="440" Canvas.Left="3">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Width="230" HorizontalAlignment="Left">
+                <StackPanel Name="StackPanelForDisplayingAdjacencyMatrix" Background="LightGoldenrodYellow" Width="230">
+
+                </StackPanel>
+            </ScrollViewer>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Width="230" HorizontalAlignment="Left" Margin="10,0,10,0" Height="226" VerticalAlignment="Bottom">
+                <StackPanel Name="StackPanelForDisplayingIncidenceMatrix" Background="LightGoldenrodYellow" Width="230">
+
+                </StackPanel>
+            </ScrollViewer>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Width="230" HorizontalAlignment="Left">
+                <StackPanel Name="StackPanelForDisplayingAdjacencylist" Background="LightGoldenrodYellow" Width="230" >
+
+                </StackPanel>
+            </ScrollViewer>
+        </StackPanel>
+
+    </Canvas>
 </Window>
