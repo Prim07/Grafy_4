@@ -21,6 +21,19 @@
                 <TextBox x:Name="Number_Of_Vertex" Width="66" Height="20" Text="4"/>
             </StackPanel>
 
+            <TextBlock Width="280" HorizontalAlignment="Left" TextAlignment="Center" FontSize="16"  Margin="10,30,0,0" Height="21">
+                Koduj digraf
+            </TextBlock>
+            <StackPanel Orientation="Horizontal" Margin="10,10,0,0">
+                <TextBlock Width="175" HorizontalAlignment="Left">Wpisz liczbę krawędzi:</TextBlock>
+                <TextBox HorizontalAlignment="Right" TextWrapping="Wrap" Width="90" Height="20" PreviewTextInput="Num_of_V_PreviewTextInput" x:Name="Num_of_E" TextChanged="Num_of_E_TextChanged" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal"  Margin="10,5,0,0">
+                <TextBlock Width="175" HorizontalAlignment="Left">Wpisz liczbę wierzchołków:</TextBlock>
+                <TextBox HorizontalAlignment="Right" IsEnabled="False" TextWrapping="Wrap" Width="90" Height="20" PreviewTextInput="Num_of_V_PreviewTextInput" x:Name="Num_of_V" TextChanged="Num_of_V_TextChanged"/>
+            </StackPanel>
+            <StackPanel Name="StackPanelWithConnections" />
+
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="700" Height="226" Canvas.Top="440" Canvas.Left="3">
