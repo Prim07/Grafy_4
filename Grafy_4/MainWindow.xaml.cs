@@ -43,7 +43,7 @@ namespace Grafy_4
                 Random r = new Random();
                 int v = Int32.Parse(Number_Of_Vertex.Text);
 
-                AdjacencyMatrix adjacencyMatrix = new AdjacencyMatrix(v);
+                adjacencyMatrix = new AdjacencyMatrix(v);
 
                 for (int i = 0; i < v; i++)
                 {
@@ -102,7 +102,7 @@ namespace Grafy_4
 
                 if (num_e != "")
                 {
-                    if ((Int32.Parse(num_e) * Int32.Parse(num_e) - Int32.Parse(num_e)) / 2 <= Int32.Parse(num_v))
+                    if ((Int32.Parse(num_v) * Int32.Parse(num_v) - Int32.Parse(num_v)) / 2 >= Int32.Parse(num_e))
                     {
                         GenerateConnections(Int32.Parse(num_v), Int32.Parse(num_e));
                         Num_of_E.Background = Brushes.White;
@@ -253,6 +253,12 @@ namespace Grafy_4
         {
             Regex regex = new Regex("[^0-9]+");
             e.Handled = regex.IsMatch(e.Text);
+        }
+
+        private void KosarajuAlgorithmButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (adjacencyMatrix != null)
+                adjacencyMatrix.KorsarajuAlgorithm(StronglyConnectedComponents);
         }
     }
 }

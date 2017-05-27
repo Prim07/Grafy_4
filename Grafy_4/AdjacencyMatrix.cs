@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -177,6 +178,98 @@ namespace Grafy_4
             //Canvas.SetLeft(label, p.X);
             //Canvas.SetTop(label, p.Y);
             //_canvas.Children.Add(label);
+        }
+
+        //========================================================
+        // Algorytm Korsaraju
+        //========================================================
+        
+        // Algorytm przejścia DFStack
+        private void DFStack(int v, bool[] visited, Stack<int> S, int[,] graph, TextBlock SCC)
+        {
+            visited[v] = true;
+            for (int u = 0; u < AdjacencyArray.GetLength(0); u++)
+                if(AdjacencyArray[v, u] == 1)
+                    if(visited[u] == false)
+                        DFStack(u, visited, S, graph, SCC);
+            S.Push(v);
+            //SCC.Text += "\nPushed";
+        }
+
+        // Algorytm przejścia DFSprint
+        private void DFSprint(int v, bool[] visited, int[,] graph, TextBlock SCC)
+        {
+            visited[v] = true;
+            //
+            // Pisz v
+            SCC.Text += (v + 1).ToString() + " ";
+            //
+            for(int u = 0; u < AdjacencyArray.GetLength(0); u++)
+                if (AdjacencyArray[v, u] == 1)
+                    if (visited[u] == false)
+                        DFSprint(u, visited, graph, SCC);
+        }
+
+        public void KorsarajuAlgorithm(TextBlock SCC)
+        {
+            SCC.Text = "";
+
+            int n = AdjacencyArray.GetLength(0);
+
+            // Kopiujemy macierz sąsiedztwa do nowego grafu
+            int[,] graph = new int[AdjacencyArray.GetLength(0), AdjacencyArray.GetLength(1)];
+            for (int i = 0; i < AdjacencyArray.GetLength(0); i++)
+                for (int j = 0; j < AdjacencyArray.GetLength(1); j++)
+                    graph[i, j] = AdjacencyArray[i, j];
+
+            bool[] visited = new bool[n];   // domyślnie wszystko jest ustawione na false
+            
+            Stack<int> S = new Stack<int>();
+
+            for(int v = 0; v < n; v++)
+                if (visited[v] == false)
+                    DFStack(v, visited, S, graph, SCC);
+
+            //SCC.Text += "Stos po DFStack: \n";
+            //for (int i = 0; i < S.Count; i++)
+            //    SCC.Text += (S.ElementAt<int>(S.Count - i - 1) + 1).ToString() + ", ";
+            //SCC.Text += "\n";
+
+            TransposeGraph(graph, n);
+
+            for (int i = 0; i < n; i++)
+                visited[i] = false;
+
+            int cn = 0;     // licznik silnie spójnych składowych
+            while (S.Count != 0)
+            {
+                int v = S.Peek();
+                S.Pop();
+
+                if (visited[v] != true)
+                {
+                    cn++;
+                    //
+                    // Pisz SCC, cn, :
+                    SCC.Text += "SCC " + cn.ToString() + ": ";
+                    //
+                    DFSprint(v, visited, graph, SCC);
+                    SCC.Text += "\n";
+                }
+
+            }
+        }
+
+        private void TransposeGraph(int[,] graph, int n)
+        {
+            int[,] tmpGraph = new int[n, n];
+            for (int i = 0; i < n; i++)
+                for (int j = 0; j < n; j++)
+                    tmpGraph[i, j] = graph[i, j];
+
+            for (int i = 0; i < n; i++)
+                for (int j = 0; j < n; j++)
+                    graph[i, j] = tmpGraph[j, i];
         }
     }
 }
