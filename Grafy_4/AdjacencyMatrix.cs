@@ -15,16 +15,19 @@ namespace Grafy_4
     {
         // Brzydkoszybka enkapsulacja
         public int[,] AdjacencyArray;
+        public int[,] AdjacencyArrayWeights;
 
         // Konstruktor
         public AdjacencyMatrix(int n)
         {
             AdjacencyArray = new int[n, n];
+            AdjacencyArrayWeights = new int[n, n];
             for (int i = 0; i < n; i++)
             {
                 for (int j = 0; j < n; j++)
                 {
                     AdjacencyArray[i, j] = 0;
+                    AdjacencyArrayWeights[i, j] = 0;
                 }
             }
         }
@@ -117,7 +120,7 @@ namespace Grafy_4
                         // drawing arrow line
                         Point point11 = new Point(x_oc, y_oc);
                         Point point12 = new Point(x_oc_2, y_oc_2);
-                        DrawArrow(point11, point12, MyCanvas);
+                        DrawArrow(point11, point12, AdjacencyArrayWeights[i - 1, j - 1], MyCanvas);
                     }
                 }
 
@@ -127,7 +130,7 @@ namespace Grafy_4
             }
         }
 
-        private void DrawArrow(Point p1, Point p2, Canvas MyCanvas)
+        private void DrawArrow(Point p1, Point p2, int weight, Canvas MyCanvas)
         {
             GeometryGroup lineGroup = new GeometryGroup();
             double theta = Math.Atan2((p2.Y - p1.Y), (p2.X - p1.X)) * 180 / Math.PI;
@@ -172,24 +175,26 @@ namespace Grafy_4
 
             MyCanvas.Children.Add(path);
 
-            //Label label = new Label();
-            //label.Foreground = Brushes.Black;
-            //label.Content = connection.Weight;
-            //Canvas.SetLeft(label, p.X);
-            //Canvas.SetTop(label, p.Y);
-            //_canvas.Children.Add(label);
+            Label label = new Label();
+            label.Foreground = Brushes.PaleVioletRed;
+            label.Content = weight.ToString();
+            label.FontWeight = FontWeights.Bold;
+            label.FontSize = 15;
+            Canvas.SetLeft(label, p.X);
+            Canvas.SetTop(label, p.Y);
+            MyCanvas.Children.Add(label);
         }
 
         //========================================================
-        // Algorytm Korsaraju
+        // Algorytm Kosaraju
         //========================================================
         
         // Algorytm przejścia DFStack
         private void DFStack(int v, bool[] visited, Stack<int> S, int[,] graph, TextBlock SCC)
         {
             visited[v] = true;
-            for (int u = 0; u < AdjacencyArray.GetLength(0); u++)
-                if(AdjacencyArray[v, u] == 1)
+            for (int u = 0; u < graph.GetLength(0); u++)
+                if(graph[v, u] == 1)
                     if(visited[u] == false)
                         DFStack(u, visited, S, graph, SCC);
             S.Push(v);
@@ -197,20 +202,21 @@ namespace Grafy_4
         }
 
         // Algorytm przejścia DFSprint
-        private void DFSprint(int v, bool[] visited, int[,] graph, TextBlock SCC)
+        private void DFSprint(int v, bool[] visited, int[,] graph, TextBlock SCC, List<int> currCompList)
         {
             visited[v] = true;
             //
             // Pisz v
             SCC.Text += (v + 1).ToString() + " ";
+            currCompList.Add(v);
             //
-            for(int u = 0; u < AdjacencyArray.GetLength(0); u++)
-                if (AdjacencyArray[v, u] == 1)
+            for(int u = 0; u < graph.GetLength(0); u++)
+                if (graph[v, u] == 1)
                     if (visited[u] == false)
-                        DFSprint(u, visited, graph, SCC);
+                        DFSprint(u, visited, graph, SCC, currCompList);
         }
 
-        public void KorsarajuAlgorithm(TextBlock SCC)
+        public List<List<int>> KosarajuAlgorithm(TextBlock SCC)
         {
             SCC.Text = "";
 
@@ -230,15 +236,12 @@ namespace Grafy_4
                 if (visited[v] == false)
                     DFStack(v, visited, S, graph, SCC);
 
-            //SCC.Text += "Stos po DFStack: \n";
-            //for (int i = 0; i < S.Count; i++)
-            //    SCC.Text += (S.ElementAt<int>(S.Count - i - 1) + 1).ToString() + ", ";
-            //SCC.Text += "\n";
-
             TransposeGraph(graph, n);
 
             for (int i = 0; i < n; i++)
                 visited[i] = false;
+
+            List<List<int>> listOfSSC = new List<List<int>>();
 
             int cn = 0;     // licznik silnie spójnych składowych
             while (S.Count != 0)
@@ -249,15 +252,17 @@ namespace Grafy_4
                 if (visited[v] != true)
                 {
                     cn++;
+                    List<int> currCompList = new List<int>();
                     //
                     // Pisz SCC, cn, :
                     SCC.Text += "SCC " + cn.ToString() + ": ";
                     //
-                    DFSprint(v, visited, graph, SCC);
+                    DFSprint(v, visited, graph, SCC, currCompList);
                     SCC.Text += "\n";
+                    listOfSSC.Add(currCompList);
                 }
-
             }
+            return listOfSSC;
         }
 
         private void TransposeGraph(int[,] graph, int n)
@@ -270,6 +275,136 @@ namespace Grafy_4
             for (int i = 0; i < n; i++)
                 for (int j = 0; j < n; j++)
                     graph[i, j] = tmpGraph[j, i];
+        }
+
+        //Stwórz silnie spójny digraf
+        internal void RandomStronglyConnectedDigraph(TextBlock SCC, int num_of_e, int probability)
+        {
+            int n = AdjacencyArray.GetLength(0);
+
+            Random r = new Random();
+            int i_to_draw = r.Next(0, n);
+            int j_to_draw = r.Next(0, n);
+            while (num_of_e > 0)
+            {
+                //int probability_curr = r.Next(0, 100);
+               // if (probability_curr < probability)
+              //  {
+                    while ((AdjacencyArray[i_to_draw, j_to_draw] != 0) || (i_to_draw == j_to_draw))
+                    {
+                        i_to_draw = r.Next(0, n);
+                        j_to_draw = r.Next(0, n);
+                    }
+                    AdjacencyArray[i_to_draw, j_to_draw] = 1;
+                    num_of_e--;
+               // }
+            }
+
+
+            //=================================
+            List<List<int>> listOfSCC = KosarajuAlgorithm(SCC);
+            
+            for (int i = 0; i < listOfSCC.Count - 1; i++)
+            {
+                AdjacencyArray[listOfSCC[i][0], listOfSCC[i + 1][0]] = 1;
+                AdjacencyArray[listOfSCC[i + 1][listOfSCC[i + 1].Count - 1], listOfSCC[i][listOfSCC[i].Count - 1]] = 1;
+            }
+            KosarajuAlgorithm(SCC);
+
+
+            //=================================
+            // losowanie wag na łukach
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (AdjacencyArray[i, j] == 1)
+                        AdjacencyArrayWeights[i, j] = r.Next(-5, 11);
+                }
+            }
+        }
+
+
+        //========================================================
+        // Algorytm Bellmana-Forda
+        //========================================================
+
+        internal bool BellmanFordAlorithm(TextBlock SP)
+        {
+            int n = AdjacencyArray.GetLength(0);
+
+            // Kopiujemy macierz sąsiedztwa do nowego grafu
+            int[,] graph = new int[AdjacencyArray.GetLength(0), AdjacencyArray.GetLength(1)];
+            for (int i = 0; i < AdjacencyArray.GetLength(0); i++)
+                for (int j = 0; j < AdjacencyArray.GetLength(1); j++)
+                    graph[i, j] = AdjacencyArray[i, j];
+
+            //wierzchołek startowy
+            int v = 0;
+
+            //elementy pomocnicze
+            bool test;
+
+            //utworzenie n-elementowej tablicy d i wypełnienie jej wartościami maksymalnymi
+            //oraz n-elementowej tablicy p i wypełnienie jej wartościami -1
+            Int32[] d = new Int32[n];
+            Int32[] p = new Int32[n];
+            for (int i = 0; i < n; i++)
+            {
+                d[i] = Int32.MaxValue;
+                p[i] = -1;
+            }
+            d[v] = 0;
+            for(int i = 2; i < n; i++)
+            {
+                test = true;
+                for(int x = 0; x < n - 1; x++)
+                {
+                    for(int y = 0; y < n; y++)
+                    {
+                        if(graph[x, y] == 1)
+                        {
+                            if (d[y] >= d[x] + AdjacencyArrayWeights[x, y])
+                            {
+                                test = false;
+                                d[y] = d[x] + AdjacencyArrayWeights[x, y];
+                                p[y] = x;
+                            }
+                        }
+                    }
+                }
+                //if (test == true)
+                  //  return true;
+            }
+            for (int x = 0; x < n - 1; x++)
+            {
+                for (int y = 0; y < n; y++)
+                {
+                    if (graph[x, y] == 1)
+                    {
+                        if (d[y] > d[x] + AdjacencyArrayWeights[x, y])
+                            return false;
+                    }
+                }
+            }
+            WriteShortestPaths(d, p, SP);
+
+            return true;
+        }
+
+        private void WriteShortestPaths(Int32[] d, Int32[] p, TextBlock SP)
+        {
+            int n = d.Length;
+            SP.Text = "Najkrótsze ścieżki:\n ";
+            for (int i = 0; i < n; i++)
+            {
+                SP.Text += d[i] + "\n ";
+            }
+            SP.Text += "\n";
+            for (int i = 0; i < n; i++)
+            {
+                SP.Text += p[i] + " ";
+            }
         }
     }
 }

@@ -255,10 +255,73 @@ namespace Grafy_4
             e.Handled = regex.IsMatch(e.Text);
         }
 
+        //Szukaj silnie spójnych składowych na digrafie (algorytm Kosaraju)
         private void KosarajuAlgorithmButton_Click(object sender, RoutedEventArgs e)
         {
             if (adjacencyMatrix != null)
-                adjacencyMatrix.KorsarajuAlgorithm(StronglyConnectedComponents);
+                adjacencyMatrix.KosarajuAlgorithm(StronglyConnectedComponents);
+        }
+
+        //Wylosuj silnie spójny digraf
+        private void RandomStronglyConnectedDigraph_Click(object sender, RoutedEventArgs e)
+        {
+            MyCanvas.Children.Clear();
+
+            if((Number_Of_Edges_SCD.Text != ""))
+            {
+                if ((Number_Of_Vertexes_SCD.Text != ""))
+                {
+                    
+
+                    int num_of_e = Int32.Parse(Number_Of_Edges_SCD.Text);
+                    int num_of_v = Int32.Parse(Number_Of_Vertexes_SCD.Text);
+                    int probability = Int32.Parse(Probability_Of_Edge_Occurence_SCD.Text);
+
+                    if (num_of_e >= 2)
+                    {
+                        if ((num_of_v * num_of_v - num_of_v) >= num_of_e)
+                        {
+                            Number_Of_Vertexes_SCD.Background = Brushes.White;
+                            Number_Of_Edges_SCD.Background = Brushes.White;
+
+                            adjacencyMatrix = new AdjacencyMatrix(num_of_v);
+                            adjacencyMatrix.RandomStronglyConnectedDigraph(StronglyConnectedComponents, num_of_e, probability);
+                            adjacencyMatrix.Display(StackPanelForDisplayingAdjacencyMatrix, MyCanvas, StackPanelForDisplayingIncidenceMatrix, StackPanelForDisplayingAdjacencylist);
+                        }
+                        else
+                        {
+                            Number_Of_Vertexes_SCD.Background = Brushes.OrangeRed;
+                        }
+                    }
+                    else
+                    {
+                        Number_Of_Edges_SCD.Background = Brushes.OrangeRed;
+                    }
+                }
+                else
+                {
+                    Number_Of_Vertexes_SCD.Background = Brushes.OrangeRed;
+                }
+            }
+            else
+            {
+                Number_Of_Edges_SCD.Background = Brushes.OrangeRed;
+            }
+        }
+
+        private void ComputeShortestPath_Click(object sender, RoutedEventArgs e)
+        {
+            if (adjacencyMatrix != null)
+            {
+                List<List<int>> listOfSCC = adjacencyMatrix.KosarajuAlgorithm(StronglyConnectedComponents);
+                if (listOfSCC.Count == 1)
+                {
+                    if(adjacencyMatrix.BellmanFordAlorithm(ShortestPathsTextBlock) == false)
+                    {
+                        ShortestPathsTextBlock.Text = "Ujemny cykl!!!\n";
+                    }
+                }
+            }
         }
     }
 }
