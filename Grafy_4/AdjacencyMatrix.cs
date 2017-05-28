@@ -364,7 +364,7 @@ namespace Grafy_4
                     {
                         if(graph[x, y] == 1)
                         {
-                            if (d[y] >= d[x] + AdjacencyArrayWeights[x, y])
+                            if (d[y] > d[x] + AdjacencyArrayWeights[x, y])
                             {
                                 test = false;
                                 d[y] = d[x] + AdjacencyArrayWeights[x, y];
@@ -388,7 +388,6 @@ namespace Grafy_4
                 }
             }
             WriteShortestPaths(d, p, SP);
-
             return true;
         }
 
