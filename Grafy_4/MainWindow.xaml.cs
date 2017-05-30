@@ -25,7 +25,9 @@ namespace Grafy_4
         private AdjacencyMatrix adjacencyMatrix;
         public List<ComboBox> ListOfLeftComboBoxes;
         public List<ComboBox> ListOfRightComboBoxes;
+        public List<TextBox> ListOfWeightTextBoxes;
         public int LeftComboBoxValue = 0;
+        public int RightComboBoxValue = 0;
 
         public MainWindow()
         {
@@ -135,6 +137,7 @@ namespace Grafy_4
 
             ListOfLeftComboBoxes = new List<ComboBox>();
             ListOfRightComboBoxes = new List<ComboBox>();
+            ListOfWeightTextBoxes = new List<TextBox>();
 
             for (int i = 0; i < num_e; i++)
             {
@@ -147,6 +150,9 @@ namespace Grafy_4
 
                 TextBlock toInfo = new TextBlock();
                 toInfo.Text = " do: ";
+
+                TextBlock weightInfo = new TextBlock();
+                weightInfo.Text = " z wagą: ";
 
                 ComboBox fromComboBox = new ComboBox();
                 SetComboBox(num_v, fromComboBox);
@@ -162,18 +168,31 @@ namespace Grafy_4
                 ListOfLeftComboBoxes.Add(toComboBox);
                 toComboBox.SelectionChanged += ToComboBox_SelectionChanged;
 
+                TextBox weightTextBox = new TextBox();
+                weightTextBox.Width = 30;
+                weightTextBox.PreviewTextInput += WeightTextBox_PreviewTextInput; ;
+                weightTextBox.Tag = j + 2;
+                weightTextBox.IsEnabled = false;
+                ListOfWeightTextBoxes.Add(weightTextBox);
+                weightTextBox.SelectionChanged += WeightTextBox_SelectionChanged;
+                //weightTextBox.MouseLeave += WeightTextBox_MouseLeave;
+
 
                 stackPanelForConn.Children.Add(fromInfo);
                 stackPanelForConn.Children.Add(fromComboBox);
                 stackPanelForConn.Children.Add(toInfo);
                 stackPanelForConn.Children.Add(toComboBox);
+                stackPanelForConn.Children.Add(weightInfo);
+                stackPanelForConn.Children.Add(weightTextBox);
 
                 StackPanelWithConnections.Children.Add(stackPanelForConn);
 
-                j += 2;
+                j += 3;
             }
 
         }
+
+
 
         // Uzupełnienie ComboBoxa danymi
         private void SetComboBox(int e, ComboBox comboBox)
@@ -233,8 +252,13 @@ namespace Grafy_4
         {
             ComboBox myComboBox = sender as ComboBox;
 
+            var weightTextBox = ListOfWeightTextBoxes.Find(x => (int)x.Tag == (int)myComboBox.Tag + 1);
+
+            weightTextBox.IsEnabled = true;
+
             ComboBoxItem typeItem = (ComboBoxItem)myComboBox.SelectedItem;
             int rightComboBoxValue = Int32.Parse(typeItem.Content.ToString());
+            RightComboBoxValue = rightComboBoxValue;
 
             adjacencyMatrix.AdjacencyArray[LeftComboBoxValue - 1, rightComboBoxValue - 1] = 1;
             adjacencyMatrix.Display(StackPanelForDisplayingAdjacencyMatrix, MyCanvas, StackPanelForDisplayingIncidenceMatrix, StackPanelForDisplayingAdjacencylist);
@@ -248,10 +272,48 @@ namespace Grafy_4
 
         }
 
+        //Jeśli zmienimy wartość w "z wagą"
+        private void WeightTextBox_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+            TextBox myTextBox = sender as TextBox;
+
+            if(myTextBox.Text != "" && myTextBox.Text != "-")
+            {
+                myTextBox.Background = Brushes.White;
+                int weight = Int32.Parse(myTextBox.Text);
+
+                adjacencyMatrix.AdjacencyArrayWeights[LeftComboBoxValue - 1, RightComboBoxValue - 1] = weight;
+                adjacencyMatrix.Display(StackPanelForDisplayingAdjacencyMatrix, MyCanvas, StackPanelForDisplayingIncidenceMatrix, StackPanelForDisplayingAdjacencylist);
+
+                if (myTextBox.Text != "-")
+                {
+                    myTextBox.IsEnabled = false;
+                }
+            }
+            else
+            {
+                myTextBox.Background = Brushes.OrangeRed;
+            }
+        }
+
+        //Jeśli opuścimy pole tekstowe "z wagą"
+        private void WeightTextBox_MouseLeave(object sender, MouseEventArgs e)
+        {
+            TextBox myTextBox = sender as TextBox;
+            myTextBox.IsEnabled = false;
+        }
+
         // Rowniez sprawdza Num_of_E i inne, nie tylko Num_of_V
         private void Num_of_V_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             Regex regex = new Regex("[^0-9]+");
+            e.Handled = regex.IsMatch(e.Text);
+        }
+
+        //Sprawdza liczby i minusy
+        private void WeightTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9-]+");
             e.Handled = regex.IsMatch(e.Text);
         }
 
@@ -316,11 +378,47 @@ namespace Grafy_4
                 List<List<int>> listOfSCC = adjacencyMatrix.KosarajuAlgorithm(StronglyConnectedComponents);
                 if (listOfSCC.Count == 1)
                 {
-                    if(adjacencyMatrix.BellmanFordAlorithm(ShortestPathsTextBlock) == false)
+                    if(Search_Paths_From_TextBox.Text != "")
                     {
-                        ShortestPathsTextBlock.Text = "Ujemny cykl!!!\n";
+                        int v = Int32.Parse(Search_Paths_From_TextBox.Text) - 1;
+                        if(adjacencyMatrix.AdjacencyArray.GetLength(0) <= v)
+                        {
+                            Search_Paths_From_TextBox.Background = Brushes.OrangeRed;
+                        }
+                        else
+                        {
+                            Search_Paths_From_TextBox.Background = Brushes.White;
+                            Int32[] d = new Int32[0];
+                            if (adjacencyMatrix.BellmanFordAlorithm(ShortestPathsTextBlock, v, ref d) == true)
+                            {
+                                adjacencyMatrix.WriteShortestPaths(d, ShortestPathsTextBlock, v);
+                            }
+                            else
+                            {
+                                ShortestPathsTextBlock.Text = "Wykryto ujemny cykl.";
+                            }
+                        }
+                        
+                    }
+                    else
+                    {
+                        Search_Paths_From_TextBox.Background = Brushes.OrangeRed;
                     }
                 }
+            }
+        }
+
+        private void ComputePairs_Click(object sender, RoutedEventArgs e)
+        {
+            if (adjacencyMatrix != null)
+            {
+                List<List<int>> listOfSCC = adjacencyMatrix.KosarajuAlgorithm(StronglyConnectedComponents);
+                if (listOfSCC.Count == 1)
+                {
+                    ShortestPathsTextBlock.Text = "";
+                    adjacencyMatrix.JohnsonAlgorithm(ShortestPathsTextBlock);
+                    adjacencyMatrix.Display(StackPanelForDisplayingAdjacencyMatrix, MyCanvas, StackPanelForDisplayingIncidenceMatrix, StackPanelForDisplayingAdjacencylist);
+                }    
             }
         }
     }

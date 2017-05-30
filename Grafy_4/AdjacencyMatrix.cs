@@ -319,7 +319,9 @@ namespace Grafy_4
                 for (int j = 0; j < n; j++)
                 {
                     if (AdjacencyArray[i, j] == 1)
+                        //=================================================ZMIANAAAAA
                         AdjacencyArrayWeights[i, j] = r.Next(-5, 11);
+                        //AdjacencyArrayWeights[i, j] = r.Next(1, 11);
                 }
             }
         }
@@ -329,7 +331,7 @@ namespace Grafy_4
         // Algorytm Bellmana-Forda
         //========================================================
 
-        internal bool BellmanFordAlorithm(TextBlock SP)
+        internal bool BellmanFordAlorithm(TextBlock SP, int v, ref Int32[] d)
         {
             int n = AdjacencyArray.GetLength(0);
 
@@ -339,15 +341,12 @@ namespace Grafy_4
                 for (int j = 0; j < AdjacencyArray.GetLength(1); j++)
                     graph[i, j] = AdjacencyArray[i, j];
 
-            //wierzchołek startowy
-            int v = 0;
-
             //elementy pomocnicze
             bool test;
 
             //utworzenie n-elementowej tablicy d i wypełnienie jej wartościami maksymalnymi
             //oraz n-elementowej tablicy p i wypełnienie jej wartościami -1
-            Int32[] d = new Int32[n];
+            d = new Int32[n];
             Int32[] p = new Int32[n];
             for (int i = 0; i < n; i++)
             {
@@ -355,16 +354,16 @@ namespace Grafy_4
                 p[i] = -1;
             }
             d[v] = 0;
-            for(int i = 2; i < n; i++)
+            for(int i = 1; i <= n - 1; i++)
             {
                 test = true;
-                for(int x = 0; x < n - 1; x++)
+                for(int x = 0; x < n; x++)
                 {
                     for(int y = 0; y < n; y++)
                     {
                         if(graph[x, y] == 1)
                         {
-                            if (d[y] > d[x] + AdjacencyArrayWeights[x, y])
+                            if ((d[y] > d[x] + AdjacencyArrayWeights[x, y] ) && d[x] != Int32.MaxValue)
                             {
                                 test = false;
                                 d[y] = d[x] + AdjacencyArrayWeights[x, y];
@@ -373,10 +372,10 @@ namespace Grafy_4
                         }
                     }
                 }
-                //if (test == true)
-                  //  return true;
+                if (test == true)
+                    return true;
             }
-            for (int x = 0; x < n - 1; x++)
+            for (int x = 0; x < n; x++)
             {
                 for (int y = 0; y < n; y++)
                 {
@@ -387,23 +386,191 @@ namespace Grafy_4
                     }
                 }
             }
-            WriteShortestPaths(d, p, SP);
+
             return true;
         }
 
-        private void WriteShortestPaths(Int32[] d, Int32[] p, TextBlock SP)
+        public void WriteShortestPaths(Int32[] d, TextBlock SP, int v)
         {
-            int n = d.Length;
-            SP.Text = "Najkrótsze ścieżki:\n ";
-            for (int i = 0; i < n; i++)
+            SP.Text = "Najkrótsze ścieżki od wierzchołka " + (v + 1).ToString() + ":\n ";
+            for (int i = 0; i < d.Length; i++)
             {
-                SP.Text += d[i] + "\n ";
-            }
-            SP.Text += "\n";
-            for (int i = 0; i < n; i++)
-            {
-                SP.Text += p[i] + " ";
+                SP.Text += " do " + (i + 1).ToString() + " : " + d[i] + "\n ";
             }
         }
+
+
+        /*
+        //========================================================
+        // Algorytm Dijkstry
+        //========================================================
+
+        internal void DijkstraAlgorithm(TextBlock SP, int v)
+        {
+            int n = AdjacencyArray.GetLength(0);
+
+            // Kopiujemy macierz sąsiedztwa do nowego grafu
+            int[,] graph = new int[AdjacencyArray.GetLength(0), AdjacencyArray.GetLength(1)];
+            for (int i = 0; i < AdjacencyArray.GetLength(0); i++)
+                for (int j = 0; j < AdjacencyArray.GetLength(1); j++)
+                    graph[i, j] = AdjacencyArray[i, j];
+
+            List<int> S = new List<int>();
+
+            List<int> Q = new List<int>();
+            for (int i = 0; i < n; i++)
+                Q.Add(i);
+
+            //tablica na koszty dojścia inicjalizowana największymi wartościami
+            Int32[] d = new Int32[n];
+            //tablica poprzedników na ścieżkach inizjalizowana -1
+            Int32[] p = new Int32[n];
+            //boole
+            bool[] sptSet = new bool[n];
+
+            for (int i = 0; i < n; i++)
+            {
+                d[i] = Int32.MaxValue;
+                p[i] = -1;
+                sptSet[i] = false;
+            }
+            d[v] = 0;   //koszt do samego siebie
+
+            /*
+            while(Q.Count > 0)
+            {
+                //var u = Q.IndexOf(Q.Min());
+                //S.Add(Q[u]);
+                //Q.RemoveAt(u);
+                int u = -1;
+                int min_d = Int32.MaxValue;
+                for(int i = 0; i < n; i++)
+                    if(d[i] < min_d)
+                    {
+                        u = i;
+                        min_d = d[i];
+                    }
+
+                Q.RemoveAt(u);
+                sptSet[u] = true;
+
+                for (int w = 0; w < n; w++)
+                    if (graph[u, w] == 1)
+                    {
+                        //if (Q.FindIndex(item => item == w) >= 0)
+                        bool flag = false;
+                        for (int i = 0; i < Q.Count; i++)
+                            if (Q[i] == w)
+                                flag = true;
+                        if (flag == true)
+                        {
+                            if ((d[w] > d[u] + AdjacencyArrayWeights[u, w]) && (d[u] != Int32.MaxValue) && (sptSet[w] == false))
+                            {
+                                d[w] = d[u] + AdjacencyArrayWeights[u, w];
+                                p[w] = u;
+                            }
+                        }
+                    }
+            }
+            
+
+            for (int x = 0; x < n; x++)
+            {
+                for (int y = 0; y < n; y++)
+                {
+                    if (graph[x, y] == 1)
+                    {
+                        if ((d[y] > d[x] + AdjacencyArrayWeights[x, y]) && d[x] != Int32.MaxValue)
+                        {
+                            d[y] = d[x] + AdjacencyArrayWeights[x, y];
+                            p[y] = x;
+                        }
+                    }
+                }
+            }
+
+            WriteShortestPaths(d, SP, v);
+        }
+        */
+
+        //========================================================
+        // Algorytm Johnsona
+        //========================================================
+        internal void JohnsonAlgorithm(TextBlock SP)
+        {
+            // miejsce na nową macierz
+            // n - 1 to indeks nowego wierzchołka
+            int n = AdjacencyArray.GetLength(0) + 1;
+
+            // Kopiujemy macierz sąsiedztwa do nowego grafu większego o jeden wierzchołek
+            int[,] graph = new int[n, n];
+            //Kopiujemy macierz wag do nowej macierzy dla nowego grafu
+            int[,] graphWeights = new int[n, n];
+
+            for (int i = 0; i < n - 1; i++)
+                for (int j = 0; j < n - 1; j++)
+                {
+                    graph[i, j] = AdjacencyArray[i, j];
+                    graphWeights[i, j] = AdjacencyArrayWeights[i, j];
+                }
+
+            //dokładamy połączenia od nowego wierzchołka do każdego istniejącego wierzchołka
+            //dodajemy również zerowe wagi połączeń
+            for (int i = 0; i < n; i++)
+            {
+                graph[n - 1, i] = 1;
+                graph[i, n - 1] = 0;
+                graphWeights[n - 1, i] = graphWeights[i, n - 1] = 0;
+            }
+
+            //Aktualizujemy macierz w klasie oraz jej wagi - wierzchołek jest teraz dodany
+            //jest połączony ze wszystkimi istniejącymi wcześniej wierzchołkami
+            //i jest pomiędzy każdą taką parą połączenie o wadze 0
+            AdjacencyArray = graph;
+            AdjacencyArrayWeights = graphWeights;
+
+            //Algorytmem Bellmana-Forda szukamy najkrószych ścieżek między dodanym wierzchołkiem, a resztą
+            Int32[] d = new Int32[0];
+            if(BellmanFordAlorithm(SP, n - 1, ref d))
+            {
+                //Teraz przewagowywuwywuwyjemy graf tak, by pozbyć się ujemnych wag
+                //nie zmieniając wartości najkrótszych ścieżek
+                for (int u = 0; u < n; u++)
+                    for (int v = 0; v < n; v++)
+                        AdjacencyArrayWeights[u, v] = AdjacencyArrayWeights[u, v] + d[u] - d[v];
+
+                //Teraz usuwamy początkowo dodany węzeł
+                //czyli ponownie wielkość będzie taka, jak na początku
+                n = AdjacencyArray.GetLength(0) - 1;
+
+                graph = new int[n, n];
+                graphWeights = new int[n, n];
+
+                for (int i = 0; i < n; i++)
+                    for (int j = 0; j < n; j++)
+                    {
+                        graph[i, j] = AdjacencyArray[i, j];
+                        graphWeights[i, j] = AdjacencyArrayWeights[i, j];
+                    }
+
+                AdjacencyArray = graph;
+                AdjacencyArrayWeights = graphWeights;
+
+                //Aktualizujemy teraz najkrótsze ścieżki algorytmem Dijkstry dla każdego wierzchołka
+                //który jest uparty i nie daje się zaimplementować, 
+                //więc posłużymy się bardziej procesożernym bratem Bellmanem-Fordem
+                //UWAGA!!! Tak jest w oryginalnym algorytmie, ale tutaj nie potrzebujemy tego wywoływać;
+                //          wystarczy, że użytkownik może raz jeszcze sobie odpalić algorytm
+                //for (int i = 0; i < n; i++) ;
+                   // BellmanFordAlorithm(SP, i, ref d);
+            }
+            else
+            {
+                SP.Text = "Wykryto ujemny cykl.";
+            }
+
+
+        }
+
     }
 }

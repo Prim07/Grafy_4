@@ -17,15 +17,14 @@
                     <TextBlock Text="Z prawdopodobieństwem&#xA;wystąpienia krawędzi (0 - 100%):" Width="184"/>
                     <TextBox x:Name="Probability_Of_Edge_Occurence" Width="66" Height="20" PreviewTextInput="NumbersOnly_PreviewTextInput" Text="20"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="18,0,9.667,20" Height="25">
+                <StackPanel Orientation="Horizontal" Margin="18,0,9.667,30" Height="25">
                     <TextBlock Text="Liczba wierzchołków:" Width="184" VerticalAlignment="Center"/>
                     <TextBox x:Name="Number_Of_Vertex" Width="66" Height="20" Text="5"/>
                 </StackPanel>
 
-                <Button Name="KosarajuAlgorithmButton" Content="Silnie spójne składowe (Algorytm Kosaraju)" Height="40" Width="279" HorizontalContentAlignment="Center" Click="KosarajuAlgorithmButton_Click" />
-                <TextBlock Name="StronglyConnectedComponents" Margin="20, 10, 20, 20" />
+                <Button Name="KosarajuAlgorithmButton" Content="Silnie spójne składowe (Algorytm Kosaraju)" Height="40" Width="279" HorizontalContentAlignment="Center" Click="KosarajuAlgorithmButton_Click"/>
 
-                <Button Name="RandomStronglyConnectedDigraph" Content="Wylosuj Silnie Spójny Digraf"  Height="40" Width="279" HorizontalContentAlignment="Center" Click="RandomStronglyConnectedDigraph_Click" />
+                <Button Name="RandomStronglyConnectedDigraph" Content="Wylosuj Silnie Spójny Digraf"  Height="40" Width="279" HorizontalContentAlignment="Center" Click="RandomStronglyConnectedDigraph_Click" Margin="0,30,0,0"/>
                 <StackPanel Orientation="Horizontal" Margin="18,10,9.667,0" Height="25">
                     <TextBlock Text="Minimalna liczba krawędzi:" Width="184" VerticalAlignment="Center"/>
                     <TextBox x:Name="Number_Of_Edges_SCD" Width="66" Height="20" Text="5" PreviewTextInput="NumbersOnly_PreviewTextInput"/>
@@ -35,13 +34,19 @@
                     <TextBox Name="Number_Of_Vertexes_SCD" Text="5" Width="66" Height="20" PreviewTextInput="NumbersOnly_PreviewTextInput" />
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal" Margin="18,0,9.667,0">
+                <StackPanel Orientation="Horizontal" Margin="18,0,9.667,0" Visibility="Collapsed">
                     <TextBlock Text="Z prawdopodobieństwem&#xA;wystąpienia krawędzi (0 - 100%):" Width="184"/>
                     <TextBox x:Name="Probability_Of_Edge_Occurence_SCD" Width="66" Height="20" PreviewTextInput="NumbersOnly_PreviewTextInput" Text="60"/>
                 </StackPanel>
 
-                <Button Name="ComputeShortestPath" Content="Wyszukaj najkrótsze ścieżki&#xA;(Algorytm Bellmana-Forda)" Height="40" Width="279" HorizontalContentAlignment="Center" Margin="0, 20, 0, 0" Click="ComputeShortestPath_Click" />
-                <TextBlock Name="ShortestPathsTextBlock" Margin="10, 10, 10, 0"/>
+                <Button Name="ComputeShortestPath" Content="Wyszukaj najkrótsze ścieżki&#xA;(Algorytm Bellmana-Forda)" Height="40" Width="279" HorizontalContentAlignment="Center" Margin="0, 30, 0, 0" Click="ComputeShortestPath_Click" />
+                <StackPanel Orientation="Horizontal" Margin="18,10,9.667,0" Height="25">
+                    <TextBlock Text="Od wierzchołka:" Width="184" VerticalAlignment="Center"/>
+                    <TextBox x:Name="Search_Paths_From_TextBox" Width="66" Height="20" Text="1" PreviewTextInput="NumbersOnly_PreviewTextInput"/>
+                </StackPanel>
+
+                <Button Name="ComputePairs" Content="Wyszukaj odległości pomiędzy wszystkimi&#xA;parami wierzchołków (Algorytm Johnsona)" Height="40" Width="279" HorizontalContentAlignment="Center" Margin="0, 20, 0, 0" Click="ComputePairs_Click" />
+
                 <TextBlock Width="280" HorizontalAlignment="Left" TextAlignment="Center" FontSize="16"  Margin="10,30,0,0" Height="21">
                     Koduj digraf
                 </TextBlock>
@@ -57,7 +62,7 @@
 
             </StackPanel>
         </ScrollViewer>
-        
+
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="700" Height="226" Canvas.Top="440" Canvas.Left="3">
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Width="230" HorizontalAlignment="Left">
                 <StackPanel Name="StackPanelForDisplayingAdjacencyMatrix" Background="LightGoldenrodYellow" Width="230">
@@ -66,12 +71,12 @@
             </ScrollViewer>
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Width="230" HorizontalAlignment="Left" Margin="10,0,10,0" Height="226" VerticalAlignment="Bottom">
                 <StackPanel Name="StackPanelForDisplayingIncidenceMatrix" Background="LightGoldenrodYellow" Width="230">
-
+                    <TextBlock Name="StronglyConnectedComponents" Margin="20, 10, 20, 20" Background="LightGoldenrodYellow" />
                 </StackPanel>
             </ScrollViewer>
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Width="230" HorizontalAlignment="Left">
                 <StackPanel Name="StackPanelForDisplayingAdjacencylist" Background="LightGoldenrodYellow" Width="230" >
-
+                    <TextBlock Name="ShortestPathsTextBlock" Margin="10, 10, 10, 0" Background="LightGoldenrodYellow"/>
                 </StackPanel>
             </ScrollViewer>
         </StackPanel>
